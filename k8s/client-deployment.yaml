@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+  labels:
+    component: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+        component: web
+  template:
+    metadata:
+      labels:
+        component: web
+    spec: 
+      containers:
+        - name: client-web
+          image: sunil1912/multi-client:latest
+          ports:
+            - containerPort: 3000
+

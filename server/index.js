@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
+const { createClient } = require('redis');
 
 const redisHost = process.env.REDIS_HOST || 'localhost';
 const redisPort = process.env.REDIS_PORT || 6379;
@@ -14,14 +15,6 @@ const pgDatabase = process.env.PG_DATABASE || 'postgres';
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-console.log({
-    user: pgUser,
-    host: pgHost,
-    port: pgPort,
-    password: pgPassword,
-    database: pgDatabase
-})
 
 const pgClient = new Pool({
     user: pgUser,
@@ -58,15 +51,18 @@ connectWithRetry()
 pgClient.on('error', () => console.log('Lost PG connection'));
 
 
-const redis = require('redis');
-const redisClient = redis.createClient({
-    host: redisHost,
-    port: redisPort,
-    retry_strategy: () => 1000
+
+
+const redisClient = createClient({
+    url: `redis://${redisHost}:${redisPort}`,
+    pingInterval: 5000
 });
 
-const redisPublisher = redisClient.duplicate();
+redisClient.on('connect', () => console.log('Redis Client Connected'));
+redisClient.on('error', (err) => console.log('Redis Client Error', err));
+redisClient.connect();
 
+const redisPublisher = redisClient.duplicate();
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
