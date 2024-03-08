@@ -17,7 +17,6 @@ spec:
       containers:
         - name: worker
           image: sunil1912/multi-worker
-          always: true
           env:
             - name: REDIS_HOST
               value: redis-service

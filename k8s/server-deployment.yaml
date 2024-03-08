@@ -17,7 +17,6 @@ spec:
       containers:
         - name: server
           image: sunil1912/multi-server:latest
-          always: true
           ports:
             - containerPort: 5000
           env:
